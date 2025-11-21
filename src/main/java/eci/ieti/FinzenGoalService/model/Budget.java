@@ -9,28 +9,29 @@ import java.time.LocalDate;
 import java.time.OffsetDateTime;
 
 @Entity
-@Table(name = "goals")
+@Table(name = "budgets", indexes = {
+        @Index(columnList = "user_id, category", name = "idx_user_category")
+})
 @Getter
 @Setter
 @NoArgsConstructor
-public class Goal {
+public class Budget {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false)
     private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "goal_id")
+    private Goal goal; // optional link to a goal
     @Column(nullable = false)
-    private String name;
-    @Column(columnDefinition = "text")
-    private String description;
+    private String category; // textual category aligned with Transactions categories
     @Column(nullable = false, precision = 18, scale = 2)
-    private BigDecimal targetAmount;
+    private BigDecimal amount;
     @Column(nullable = false, precision = 18, scale = 2)
-    private BigDecimal savedAmount = BigDecimal.ZERO;
-    private LocalDate dueDate;
-    private String category; // Goals category (high level)
-    @Column(nullable = false)
-    private String status; // ACTIVE, COMPLETED, EXPIRED
+    private BigDecimal initialAmount;
+    private LocalDate startDate;
+    private LocalDate endDate;
     @Column(nullable = false, updatable = false)
     private OffsetDateTime createdAt = OffsetDateTime.now();
     private OffsetDateTime updatedAt = OffsetDateTime.now();
