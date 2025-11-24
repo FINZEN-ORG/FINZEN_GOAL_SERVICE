@@ -1,5 +1,6 @@
 package eci.ieti.FinzenGoalService.dto;
 
+import eci.ieti.FinzenGoalService.model.GoalCategory;
 import lombok.Data;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -13,6 +14,6 @@ public class GoalDto {
     private BigDecimal targetAmount;
     private BigDecimal savedAmount;
     private LocalDate dueDate;
-    private String category;
+    private GoalCategory category;
     private String status;
 }

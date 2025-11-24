@@ -2,6 +2,7 @@ package eci.ieti.FinzenGoalService.controller;
 
 import eci.ieti.FinzenGoalService.dto.BudgetDto;
 import eci.ieti.FinzenGoalService.service.BudgetService;
+import jakarta.servlet.http.HttpServletRequest; // Importante
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,8 +23,9 @@ public class BudgetController {
     }
 
     @GetMapping
-    public ResponseEntity<List<BudgetDto>> list(Authentication authentication) {
+    public ResponseEntity<List<BudgetDto>> list(Authentication authentication, HttpServletRequest request) {
         Long userId = Long.valueOf(authentication.getName());
-        return ResponseEntity.ok(budgetService.listByUser(userId));
+        String token = request.getHeader("Authorization");
+        return ResponseEntity.ok(budgetService.listByUserWithRealTimeStatus(userId, token));
     }
 }

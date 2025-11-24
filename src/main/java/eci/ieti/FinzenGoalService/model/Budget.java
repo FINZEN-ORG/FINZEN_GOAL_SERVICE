@@ -10,7 +10,7 @@ import java.time.OffsetDateTime;
 
 @Entity
 @Table(name = "budgets", indexes = {
-        @Index(columnList = "user_id, category", name = "idx_user_category")
+        @Index(columnList = "userId, categoryId", name = "idx_user_category")
 })
 @Getter
 @Setter
@@ -21,15 +21,10 @@ public class Budget {
     private Long id;
     @Column(nullable = false)
     private Long userId;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "goal_id")
-    private Goal goal; // optional link to a goal
     @Column(nullable = false)
-    private String category; // textual category aligned with Transactions categories
+    private Long categoryId;
     @Column(nullable = false, precision = 18, scale = 2)
-    private BigDecimal amount;
-    @Column(nullable = false, precision = 18, scale = 2)
-    private BigDecimal initialAmount;
+    private BigDecimal amount; // El límite del presupuesto
     private LocalDate startDate;
     private LocalDate endDate;
     @Column(nullable = false, updatable = false)

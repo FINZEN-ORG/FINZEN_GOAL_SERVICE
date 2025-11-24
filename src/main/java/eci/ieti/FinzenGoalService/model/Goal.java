@@ -28,7 +28,9 @@ public class Goal {
     @Column(nullable = false, precision = 18, scale = 2)
     private BigDecimal savedAmount = BigDecimal.ZERO;
     private LocalDate dueDate;
-    private String category; // Goals category (high level)
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private GoalCategory category;
     @Column(nullable = false)
     private String status; // ACTIVE, COMPLETED, EXPIRED
     @Column(nullable = false, updatable = false)
