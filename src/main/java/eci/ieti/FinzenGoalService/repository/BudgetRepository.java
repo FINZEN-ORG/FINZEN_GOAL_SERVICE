@@ -7,5 +7,5 @@ import java.util.Optional;
 
 public interface BudgetRepository extends JpaRepository<Budget, Long> {
     List<Budget> findByUserId(Long userId);
-    Optional<Budget> findByUserIdAndCategory(Long userId, String category);
+    Optional<Budget> findByUserIdAndCategoryId(Long userId, String categoryId);
 }
