@@ -19,7 +19,9 @@ public class GoalService {
 
     public GoalDto create(GoalDto dto) {
         Goal entity = mapper.toEntity(dto);
-        entity.setSavedAmount(dto.getSavedAmount() == null ? entity.getSavedAmount() : dto.getSavedAmount());
+        if (entity.getSavedAmount() == null) {
+            entity.setSavedAmount(BigDecimal.ZERO);
+        }
         entity.setStatus(entity.getStatus() == null ? "ACTIVE" : entity.getStatus());
         Goal saved = goalRepository.save(entity);
         return mapper.toDto(saved);

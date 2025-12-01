@@ -8,7 +8,6 @@ import java.time.LocalDate;
 public class BudgetDto {
     private Long id;
     private Long userId;
-    private Long goalId;
     private Long categoryId;
     private BigDecimal amount; // Límite
     private BigDecimal spent;  // Este campo se llenará con datos de TransactionService en tiempo de ejecución

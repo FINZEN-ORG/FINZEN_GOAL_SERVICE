@@ -26,7 +26,7 @@ public class Goal {
     @Column(nullable = false, precision = 18, scale = 2)
     private BigDecimal targetAmount;
     @Column(nullable = false, precision = 18, scale = 2)
-    private BigDecimal savedAmount = BigDecimal.ZERO;
+    private BigDecimal savedAmount;
     private LocalDate dueDate;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
