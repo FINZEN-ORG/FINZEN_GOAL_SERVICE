@@ -28,4 +28,17 @@ public class BudgetController {
         String token = request.getHeader("Authorization");
         return ResponseEntity.ok(budgetService.listByUserWithRealTimeStatus(userId, token));
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<BudgetDto> update(@PathVariable Long id, @RequestBody BudgetDto dto, Authentication authentication) {
+        Long userId = Long.valueOf(authentication.getName());
+        return ResponseEntity.ok(budgetService.update(id, dto, userId));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id, Authentication authentication) {
+        Long userId = Long.valueOf(authentication.getName());
+        budgetService.delete(id, userId);
+        return ResponseEntity.ok().build();
+    }
 }

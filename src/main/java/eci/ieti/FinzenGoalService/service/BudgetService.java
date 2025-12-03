@@ -8,6 +8,7 @@ import eci.ieti.FinzenGoalService.repository.BudgetRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -16,6 +17,7 @@ import java.time.LocalTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,6 +28,12 @@ public class BudgetService {
     private final WebClient transactionWebClient;
 
     public BudgetDto createOrUpdate(BudgetDto dto) {
+        if (dto.getId() == null) {
+            Optional<Budget> existing = budgetRepository.findByUserIdAndCategoryId(dto.getUserId(), dto.getCategoryId());
+            if (existing.isPresent()) {
+                throw new IllegalArgumentException("Ya tienes un presupuesto para esta categoría. Modifícalo en lugar de crear uno nuevo.");
+            }
+        }
         Budget budget = mapper.toEntity(dto);
         Budget saved = budgetRepository.save(budget);
         BudgetDto response = mapper.toDto(saved);
@@ -65,7 +73,6 @@ public class BudgetService {
                     .block(); // Bloqueamos (Sync) porque necesitamos los datos para responder
         } catch (Exception e) {
             // Fallback: Si TransactionService falla, devolvemos los budgets con spent = 0
-            // o lanzamos error dependiendo de la regla de negocio. Aquí Fail-Safe (spent 0).
             System.err.println("Error fetching transactions: " + e.getMessage());
             summaries = List.of();
         }
@@ -85,5 +92,29 @@ public class BudgetService {
             dto.setSpent(spentAmount);
             return dto;
         }).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public BudgetDto update(Long id, BudgetDto dto, Long userId) {
+        Budget budget = budgetRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Budget not found"));
+        if (!budget.getUserId().equals(userId)) {
+            throw new RuntimeException("Unauthorized");
+        }
+        // Lo principal a editar es el límite
+        budget.setAmount(dto.getAmount());
+        // Opcional: Permitir cambiar la categoría (aunque es raro en UX)
+        // budget.setCategoryId(dto.getCategoryId());
+        return mapper.toDto(budgetRepository.save(budget));
+    }
+
+    @Transactional
+    public void delete(Long id, Long userId) {
+        Budget budget = budgetRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Budget not found"));
+        if (!budget.getUserId().equals(userId)) {
+            throw new RuntimeException("Unauthorized");
+        }
+        budgetRepository.delete(budget);
     }
 }
