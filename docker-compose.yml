@@ -1,17 +1,33 @@
-version: '3.9'
 services:
-  postgres:
-    image: postgres:16
-    container_name: postgres-finzen
-    restart: always
+  db-goals:
+    image: postgres:14-alpine
+    container_name: finzen-db-goals
+    restart: unless-stopped
     environment:
+      POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
     ports:
-      - "${POSTGRES_PORT}:5432"
+      - "5434:5432"
     volumes:
-      - postgres_finzen_data:/var/lib/postgresql/data
+      - postgres_goals_data:/var/lib/postgresql/data
+
+  api-goals:
+    build:
+      context: .
+    container_name: finzen-api-goals
+    restart: on-failure
+    depends_on:
+      - db-goals
+    ports:
+      - "8083:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db-goals:5432/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION_MS: ${JWT_EXPIRATION_MS}
+      TRANSACTIONS_SERVICE_URL: ${TRANSACTIONS_SERVICE_URL}
 
 volumes:
-  postgres_finzen_data:
+  postgres_goals_data:

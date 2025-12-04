@@ -9,30 +9,24 @@ import java.time.LocalDate;
 import java.time.OffsetDateTime;
 
 @Entity
-@Table(name = "goals")
+@Table(name = "budgets", indexes = {
+        @Index(columnList = "userId, categoryId", name = "idx_user_category")
+})
 @Getter
 @Setter
 @NoArgsConstructor
-public class Goal {
+public class Budget {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false)
     private Long userId;
     @Column(nullable = false)
-    private String name;
-    @Column(columnDefinition = "text")
-    private String description;
+    private Long categoryId;
     @Column(nullable = false, precision = 18, scale = 2)
-    private BigDecimal targetAmount;
-    @Column(nullable = false, precision = 18, scale = 2)
-    private BigDecimal savedAmount;
-    private LocalDate dueDate;
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private GoalCategory category;
-    @Column(nullable = false)
-    private String status; // ACTIVE, COMPLETED, EXPIRED
+    private BigDecimal amount; // El límite del presupuesto
+    private LocalDate startDate;
+    private LocalDate endDate;
     @Column(nullable = false, updatable = false)
     private OffsetDateTime createdAt = OffsetDateTime.now();
     private OffsetDateTime updatedAt = OffsetDateTime.now();
